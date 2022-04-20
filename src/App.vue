@@ -9,45 +9,40 @@
 			<div class="form-container">
 				<form class="form" @submit.prevent="searchCategoriesByName">
 					<div class="form-text-field">
-						<search-input-component
-							v-model="searchQuery"
-							placeholder="Search by name"
-						/>
+						<search-input v-model="categoryName" placeholder="Search by name" />
 						<button class="submit-btn" type="submit">
 							<span class="material-icons"> search </span>
 						</button>
 					</div>
 
 					<div class="form-filters">
-						<select-input-component
+						<select-input
 							:options="categoryTypeOptions"
-							v-model="typeFilter"
+							v-model="categoryType"
 							:disabled="loading"
 						/>
 
-						<select-input-component
+						<select-input
 							:disabled="loading"
 							:options="categoryPriceOptions"
-							v-model="priceSortFilter"
+							v-model="categoryPriceSort"
 						/>
 					</div>
 				</form>
 			</div>
 
 			<div class="grid-container">
-				<template v-if="!Boolean(error) && !loading">
-					<category-item-component
-						v-for="category in categoryItems"
-						:key="category.id"
-						:img-src="category.image"
-						:name="category.name"
-						:type="category.type"
-						:price="category.price"
-					/>
-				</template>
+				<category-item
+					v-for="category in categoryItems"
+					:key="category.id"
+					:img-src="category.image"
+					:name="category.name"
+					:type="category.type"
+					:price="category.price"
+				/>
 
 				<template v-if="loading">
-					<category-item-skeleton-component v-for="n in 9" :key="n" />
+					<category-item-skeleton v-for="n in 9" :key="n" />
 				</template>
 
 				<template v-if="error && !loading">
@@ -69,38 +64,32 @@ import {
 	CATEGORY_PRICE_LABELS,
 	PriceLabels,
 } from './core/constants/category-price-labels';
-import CategoryItemComponent from './components/category-item.component.vue';
-import CategoryItemSkeletonComponent from './components/category-item-skeleton.component.vue';
-import SearchInputComponent from './components/search-input.component.vue';
-import SelectInputComponent from './components/select-input.component.vue';
+import { getSelectOptions } from './core/utils/get-select-options';
+import CategoryItem from './components/category-item.vue';
+import CategoryItemSkeleton from './components/category-item-skeleton.vue';
+import SearchInput from './components/search-input.vue';
+import SelectInput from './components/select-input.vue';
 import Vue from 'vue';
 
 const CategoriesService = new ApiCategoriesService();
-
-const getSelectOptions = (items: string[]) => {
-	return items.map((label) => ({
-		label,
-		value: label,
-	}));
-};
 
 export default Vue.extend({
 	name: 'App',
 
 	components: {
-		SearchInputComponent,
-		CategoryItemComponent,
-		CategoryItemSkeletonComponent,
-		SelectInputComponent,
+		SearchInput,
+		CategoryItem,
+		CategoryItemSkeleton,
+		SelectInput,
 	},
 
 	methods: {
 		searchCategoriesByName: async function () {
-			if (!this.searchQuery) return;
+			if (!this.categoryName) return;
 
 			const categories = await CategoriesService.filterByName(
 				this.categories,
-				this.searchQuery,
+				this.categoryName,
 			);
 
 			this.setCategoryItems(categories);
@@ -150,18 +139,18 @@ export default Vue.extend({
 		},
 
 		getFilteredCategoriesByType: async function () {
-			if (this.typeFilter === 'Todas') return this.categoryListToFilter;
+			if (this.categoryType === 'Todas') return this.categoryListToFilter;
 
 			return CategoriesService.filterByType(
 				this.categoryListToFilter,
-				this.typeFilter,
+				this.categoryType,
 			);
 		},
 	},
 
 	computed: {
 		categoryListToFilter: function (): Array<Category> {
-			const categories = this.searchQuery
+			const categories = this.categoryName
 				? this.categoryItems
 				: this.categories;
 
@@ -170,14 +159,14 @@ export default Vue.extend({
 	},
 
 	watch: {
-		searchQuery: async function (value) {
+		categoryName: async function (value) {
 			if (!value) {
 				const categories = await this.getFilteredCategoriesByType();
-				this.sortCategoriesByPrice(categories, this.priceSortFilter);
+				this.sortCategoriesByPrice(categories, this.categoryPriceSort);
 			}
 		},
 
-		typeFilter: async function (value): Promise<void> {
+		categoryType: async function (value): Promise<void> {
 			if (value === 'Todas') {
 				return void this.setCategoryItems(this.categoryListToFilter);
 			}
@@ -187,7 +176,7 @@ export default Vue.extend({
 			);
 		},
 
-		priceSortFilter: async function (value): Promise<void> {
+		categoryPriceSort: async function (value): Promise<void> {
 			const categories = await this.getFilteredCategoriesByType();
 			this.sortCategoriesByPrice(categories, value);
 		},
@@ -203,9 +192,9 @@ export default Vue.extend({
 			categoryItems: [] as Array<Category>,
 			error: '',
 			loading: false,
-			priceSortFilter: 'Mayor precio' as PriceLabels,
-			searchQuery: '',
-			typeFilter: 'Todas' as CategoryType | 'Todas',
+			categoryPriceSort: 'Mayor precio' as PriceLabels,
+			categoryName: '',
+			categoryType: 'Todas' as CategoryType | 'Todas',
 			categoryTypeOptions: [
 				{ label: 'Todas', value: 'Todas' },
 				...getSelectOptions(Object.values(CATEGORY_TYPES)),

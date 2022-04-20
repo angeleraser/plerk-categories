@@ -1,13 +1,12 @@
 <template>
 	<div class="category-item">
 		<div class="category-item-data">
-			<div class="category-item-data-img">
-				<v-img-component
-					:src="imgSrc"
-					:alt="name"
-					aria-label="Imagen de la categoria"
-				/>
-			</div>
+			<v-img-component
+				:src="imgSrc"
+				:alt="name"
+				class="category-item-data-img"
+				aria-label="Imagen de la categoria"
+			/>
 
 			<div class="category-item-data-name">
 				{{ name }}
@@ -30,7 +29,7 @@
 import { CategoryType } from '@/core/domain/models/category';
 import { formatPrice } from '@/core/utils/format-price';
 import Vue from 'vue';
-import VImgComponent from './v-img.component.vue';
+import VImgComponent from './v-img.vue';
 
 const typeTagColorNames: { [key in CategoryType]: string } = {
 	Normal: 'normal',
@@ -86,6 +85,9 @@ export default Vue.extend({
 }
 
 .category-item-data-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 	width: 80px;
 	height: 80px;
 	display: inline-block;
@@ -93,12 +95,6 @@ export default Vue.extend({
 	overflow: hidden;
 	background-color: var(--grey);
 	flex-shrink: 0;
-}
-
-.category-item-data-img img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
 }
 
 .category-item-data-name {

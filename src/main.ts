@@ -7,12 +7,13 @@ Vue.config.productionTip = false;
 const service = new ApiCategoriesService();
 
 (async function () {
-	const categories = await service.getAll({ lang: 'eng' });
+	const categories = await service.getAll();
 
 	console.log({
 		categories,
 		byName: await service.filterByName(categories, 'quality'),
 		byType: await service.filterByType(categories, 'Personalizada'),
+		sortedByPrice: await service.sortByPrice(categories, 'low'),
 	});
 })();
 

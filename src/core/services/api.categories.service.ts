@@ -5,25 +5,20 @@ import {
 	ApiCategoryLabel,
 	ApiResponse,
 } from '../domain/models/api-response';
-import { Category } from '../domain/models/category';
 import { CategoriesService } from '../domain/services/categories.service';
-import { formatPrice } from '../utils/format-price';
+import { Category } from '../domain/models/category';
+import { CATEGORY_DEFAULT_IMAGE } from '../constants/category-default-image';
 
 class ApiCategoriesService extends CategoriesService {
-	public async getAll(config: {
-		lang: keyof ApiCategoryLabel;
-	}): Promise<Category[]> {
+	public async getAll(): Promise<Category[]> {
 		const { data } = await api.get<ApiResponse>('/category');
 		const { data: categories } = data;
-		return await this.mapFromApi(categories, config.lang);
+		return await this.mapFromApi(categories);
 	}
 
-	private mapFromApi(
-		categories: Array<ApiCategory>,
-		lang: keyof ApiCategoryLabel,
-	) {
+	private mapFromApi(categories: Array<ApiCategory>) {
 		const mappedCategories = categories.map(
-			async (category) => await this.createCategory(category, lang),
+			async (category) => await this.createCategory(category, 'esp'),
 		);
 
 		return Promise.all(mappedCategories);
@@ -37,11 +32,8 @@ class ApiCategoriesService extends CategoriesService {
 
 		return {
 			name: this.getCategoryLabelByLang(name, lang),
-			image,
-			price: this.formatCategoryCurrency(suggested_budget, {
-				format: 'en-US',
-				currency: 'USD',
-			}),
+			image: this.processImageURL(image),
+			price: suggested_budget / 100,
 			type: CATEGORY_TYPES[category_type],
 			id: uuid4,
 		};
@@ -55,12 +47,16 @@ class ApiCategoriesService extends CategoriesService {
 		return name ? name : label['esp'];
 	}
 
-	private formatCategoryCurrency(
-		value: number,
-		config: { format: string; currency: string },
-	) {
-		return formatPrice(value / 100, config);
-	}
+	private processImageURL = (url: string | null): string => {
+		if (!url) return CATEGORY_DEFAULT_IMAGE;
+
+		const validationRegexp = /https/gi;
+		const matches = url.match(validationRegexp);
+
+		if (!matches || matches.length > 1) return CATEGORY_DEFAULT_IMAGE;
+
+		return url;
+	};
 }
 
 export { ApiCategoriesService };

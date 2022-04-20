@@ -103,7 +103,8 @@ export default Vue.extend({
 				const data = await CategoriesService.getAll();
 
 				this.categories = data;
-				this.setCategoryItems(this.categories);
+
+				this.sortCategoriesByPrice(data, this.categoryPriceSort);
 			} catch {
 				this.error =
 					'Ha ocurrido un error al obtener los datos, por favor, intentalo de nuevo';

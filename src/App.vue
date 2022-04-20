@@ -216,17 +216,6 @@ export default Vue.extend({
 	border-radius: 6px 0 0 6px;
 }
 
-.form-filters {
-	display: flex;
-	align-items: center;
-	margin-top: 16px;
-	width: 100%;
-}
-
-.form-filters > .select-input-wrapper:not(:last-child) {
-	margin-right: 12px;
-}
-
 .grid-container {
 	padding: 30px;
 	display: grid;
@@ -266,11 +255,6 @@ export default Vue.extend({
 	.form {
 		flex-direction: row;
 		align-items: center;
-	}
-
-	.form-filters {
-		margin-top: 0;
-		margin-left: 12px;
 	}
 }
 </style>

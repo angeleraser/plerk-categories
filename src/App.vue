@@ -148,25 +148,31 @@ export default Vue.extend({
 				);
 			}
 		},
+
+		getFilteredCategoriesByType: async function () {
+			if (this.typeFilter === 'Todas') return this.categoryListToFilter;
+
+			return CategoriesService.filterByType(
+				this.categoryListToFilter,
+				this.typeFilter,
+			);
+		},
 	},
 
 	computed: {
 		categoryListToFilter: function (): Array<Category> {
-			return this.searchQuery ? this.categoryItems : this.categories;
+			const categories = this.searchQuery
+				? this.categoryItems
+				: this.categories;
+
+			return categories;
 		},
 	},
 
 	watch: {
 		searchQuery: async function (value) {
 			if (!value) {
-				const categories =
-					this.typeFilter === 'Todas'
-						? this.categories
-						: await CategoriesService.filterByType(
-								this.categories,
-								this.typeFilter,
-						  );
-
+				const categories = await this.getFilteredCategoriesByType();
 				this.sortCategoriesByPrice(categories, this.priceSortFilter);
 			}
 		},
@@ -182,7 +188,8 @@ export default Vue.extend({
 		},
 
 		priceSortFilter: async function (value): Promise<void> {
-			this.sortCategoriesByPrice(this.categoryListToFilter, value);
+			const categories = await this.getFilteredCategoriesByType();
+			this.sortCategoriesByPrice(categories, value);
 		},
 	},
 
@@ -198,7 +205,7 @@ export default Vue.extend({
 			loading: false,
 			priceSortFilter: 'Mayor precio' as PriceLabels,
 			searchQuery: '',
-			typeFilter: 'Todas' as CategoryType & 'Todas',
+			typeFilter: 'Todas' as CategoryType | 'Todas',
 			categoryTypeOptions: [
 				{ label: 'Todas', value: 'Todas' },
 				...getSelectOptions(Object.values(CATEGORY_TYPES)),
@@ -292,7 +299,7 @@ export default Vue.extend({
 	border-radius: 0 6px 6px 0;
 }
 
-.main-content .search-input input {
+.main-content search-input input {
 	border-radius: 6px 0 0 6px;
 }
 

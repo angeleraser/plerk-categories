@@ -8,13 +8,29 @@
 		<div class="main-content">
 			<div class="main-content-form">
 				<form @submit.prevent="searchCategoriesByName">
-					<search-input-component
-						v-model="searchQuery"
-						placeholder="Search by name"
-					/>
-					<button type="submit">
-						<span class="material-icons"> search </span>
-					</button>
+					<div class="main-content-form-text-field">
+						<search-input-component
+							v-model="searchQuery"
+							placeholder="Search by name"
+						/>
+						<button type="submit">
+							<span class="material-icons"> search </span>
+						</button>
+					</div>
+
+					<div class="main-content-form-filters">
+						<select-input-component
+							:options="categoryTypeOptions"
+							v-model="typeFilter"
+							:disabled="loading"
+						/>
+
+						<select-input-component
+							:disabled="loading"
+							:options="categoryPriceOptions"
+							v-model="priceSortFilter"
+						/>
+					</div>
 				</form>
 			</div>
 
@@ -47,13 +63,26 @@
 
 <script lang="ts">
 import { ApiCategoriesService } from './core/services/api.categories.service';
-import { Category } from './core/domain/models/category';
+import { Category, CategoryType } from './core/domain/models/category';
+import { CATEGORY_TYPES } from './core/constants/category-types';
+import {
+	CATEGORY_PRICE_LABELS,
+	PriceLabels,
+} from './core/constants/category-price-labels';
 import CategoryItemComponent from './components/category-item.component.vue';
-import SearchInputComponent from './components/search-input.component.vue';
-import Vue from 'vue';
 import CategoryItemSkeletonComponent from './components/category-item-skeleton.component.vue';
+import SearchInputComponent from './components/search-input.component.vue';
+import SelectInputComponent from './components/select-input.component.vue';
+import Vue from 'vue';
 
 const CategoriesService = new ApiCategoriesService();
+
+const getSelectOptions = (items: string[]) => {
+	return items.map((label) => ({
+		label,
+		value: label,
+	}));
+};
 
 export default Vue.extend({
 	name: 'App',
@@ -62,10 +91,13 @@ export default Vue.extend({
 		SearchInputComponent,
 		CategoryItemComponent,
 		CategoryItemSkeletonComponent,
+		SelectInputComponent,
 	},
 
 	methods: {
 		searchCategoriesByName: async function () {
+			if (!this.searchQuery) return;
+
 			const categories = await CategoriesService.filterByName(
 				this.categories,
 				this.searchQuery,
@@ -92,19 +124,65 @@ export default Vue.extend({
 		setCategoryItems: function (items: Array<Category>) {
 			if (items.length === 0) {
 				this.error = 'No se encontraron categorias para mostrar.';
+				this.categoryItems = [];
 				return;
 			}
 
 			this.categoryItems = items;
 			this.error = '';
 		},
+
+		sortCategoriesByPrice: async function (
+			categories: Array<Category>,
+			order: PriceLabels,
+		) {
+			if (order === 'Mayor precio') {
+				return void this.setCategoryItems(
+					await CategoriesService.sortByPrice(categories, 'high'),
+				);
+			}
+
+			if (order === 'Menor precio') {
+				return void this.setCategoryItems(
+					await CategoriesService.sortByPrice(categories, 'low'),
+				);
+			}
+		},
+	},
+
+	computed: {
+		categoryListToFilter: function (): Array<Category> {
+			return this.searchQuery ? this.categoryItems : this.categories;
+		},
 	},
 
 	watch: {
-		searchQuery: function (value) {
+		searchQuery: async function (value) {
 			if (!value) {
-				this.setCategoryItems(this.categories);
+				const categories =
+					this.typeFilter === 'Todas'
+						? this.categories
+						: await CategoriesService.filterByType(
+								this.categories,
+								this.typeFilter,
+						  );
+
+				this.sortCategoriesByPrice(categories, this.priceSortFilter);
 			}
+		},
+
+		typeFilter: async function (value): Promise<void> {
+			if (value === 'Todas') {
+				return void this.setCategoryItems(this.categoryListToFilter);
+			}
+
+			this.setCategoryItems(
+				await CategoriesService.filterByType(this.categoryListToFilter, value),
+			);
+		},
+
+		priceSortFilter: async function (value): Promise<void> {
+			this.sortCategoriesByPrice(this.categoryListToFilter, value);
 		},
 	},
 
@@ -114,11 +192,20 @@ export default Vue.extend({
 
 	data: function () {
 		return {
-			searchQuery: '',
-			categoryItems: [] as Array<Category>,
 			categories: [] as Array<Category>,
+			categoryItems: [] as Array<Category>,
 			error: '',
 			loading: false,
+			priceSortFilter: 'Mayor precio' as PriceLabels,
+			searchQuery: '',
+			typeFilter: 'Todas' as CategoryType & 'Todas',
+			categoryTypeOptions: [
+				{ label: 'Todas', value: 'Todas' },
+				...getSelectOptions(Object.values(CATEGORY_TYPES)),
+			],
+			categoryPriceOptions: getSelectOptions(
+				Object.values(CATEGORY_PRICE_LABELS),
+			),
 		};
 	},
 });
@@ -166,10 +253,15 @@ export default Vue.extend({
 }
 
 .main-content-form,
+.main-content-form-text-field,
 .main-content form {
 	display: flex;
 	justify-content: center;
 	width: 100%;
+}
+
+.main-content-form-text-field {
+	flex-shrink: 0;
 }
 
 .main-content-form {
@@ -185,6 +277,8 @@ export default Vue.extend({
 
 .main-content form {
 	max-width: 480px;
+	flex-direction: column;
+	align-items: center;
 }
 
 .main-content form button {
@@ -198,12 +292,19 @@ export default Vue.extend({
 	border-radius: 0 6px 6px 0;
 }
 
-.main-content form .search-input {
+.main-content .search-input input {
+	border-radius: 6px 0 0 6px;
+}
+
+.main-content-form-filters {
+	display: flex;
+	align-items: center;
+	margin-top: 16px;
 	width: 100%;
 }
 
-.main-content form input {
-	border-radius: 6px 0 0 6px;
+.main-content-form-filters > .select-input:not(:last-child) {
+	margin-right: 12px;
 }
 
 .category-items {
@@ -240,6 +341,16 @@ export default Vue.extend({
 
 	.header-title {
 		font-size: 46px;
+	}
+
+	.main-content form {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.main-content-form-filters {
+		margin-top: 0;
+		margin-left: 12px;
 	}
 }
 </style>

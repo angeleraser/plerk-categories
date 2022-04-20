@@ -28,6 +28,7 @@ export default Vue.extend({
 <style>
 .search-input {
 	min-height: 52px;
+	width: 100%;
 }
 
 .search-input input {

@@ -35,9 +35,9 @@
 <script lang="ts">
 import { ApiCategoriesService } from './core/services/api.categories.service';
 import { Category } from './core/domain/models/category';
+import CategoryItemComponent from './components/category-item.component.vue';
 import SearchInputComponent from './components/search-input.component.vue';
 import Vue from 'vue';
-import CategoryItemComponent from './components/category-item.component.vue';
 
 const CategoriesService = new ApiCategoriesService();
 
@@ -124,10 +124,11 @@ export default Vue.extend({
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	padding: 22px;
 }
 
 .header-title {
-	font-size: 46px;
+	font-size: 26px;
 	font-weight: 600;
 	font-family: var(--font-spartan);
 	color: var(--white);
@@ -154,7 +155,7 @@ export default Vue.extend({
 }
 
 .main-content-form {
-	margin-bottom: 80px;
+	margin-bottom: 30px;
 	position: sticky;
 	z-index: 50;
 	top: 0;
@@ -200,6 +201,10 @@ export default Vue.extend({
 @media screen and (min-width: 1024px) {
 	.category-items {
 		grid-template-columns: 1fr 1fr 1fr;
+	}
+
+	.header-title {
+		font-size: 46px;
 	}
 }
 </style>

@@ -2,23 +2,23 @@
 	<div id="app">
 		<div class="header">
 			<h1 class="header-title">Category Search</h1>
-			<span class="material-icons header-title-icon"> pageview </span>
+			<span class="material-icons header-icon"> pageview </span>
 		</div>
 
-		<div class="main-content">
-			<div class="main-content-form">
-				<form @submit.prevent="searchCategoriesByName">
-					<div class="main-content-form-text-field">
+		<main class="main">
+			<div class="form-container">
+				<form class="form" @submit.prevent="searchCategoriesByName">
+					<div class="form-text-field">
 						<search-input-component
 							v-model="searchQuery"
 							placeholder="Search by name"
 						/>
-						<button type="submit">
+						<button class="submit-btn" type="submit">
 							<span class="material-icons"> search </span>
 						</button>
 					</div>
 
-					<div class="main-content-form-filters">
+					<div class="form-filters">
 						<select-input-component
 							:options="categoryTypeOptions"
 							v-model="typeFilter"
@@ -57,7 +57,7 @@
 					</div>
 				</template>
 			</div>
-		</div>
+		</main>
 	</div>
 </template>
 
@@ -246,32 +246,32 @@ export default Vue.extend({
 	color: var(--white);
 }
 
-.header-title-icon {
+.header-icon {
 	font-size: 60px;
 	color: var(--warning);
 	margin-left: 12px;
 }
 
-.main-content {
+.main {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	width: 100%;
 }
 
-.main-content-form,
-.main-content-form-text-field,
-.main-content form {
+.form-container,
+.form-text-field,
+.form {
 	display: flex;
 	justify-content: center;
 	width: 100%;
 }
 
-.main-content-form-text-field {
+.form-text-field {
 	flex-shrink: 0;
 }
 
-.main-content-form {
+.form-container {
 	margin-bottom: 30px;
 	position: sticky;
 	z-index: 50;
@@ -282,13 +282,13 @@ export default Vue.extend({
 	padding: 22px;
 }
 
-.main-content form {
+.form {
 	max-width: 480px;
 	flex-direction: column;
 	align-items: center;
 }
 
-.main-content form button {
+.form .submit-btn {
 	display: flex;
 	color: var(--white);
 	display: flex;
@@ -299,18 +299,18 @@ export default Vue.extend({
 	border-radius: 0 6px 6px 0;
 }
 
-.main-content search-input input {
+.main .search-input-wrapper .input {
 	border-radius: 6px 0 0 6px;
 }
 
-.main-content-form-filters {
+.form-filters {
 	display: flex;
 	align-items: center;
 	margin-top: 16px;
 	width: 100%;
 }
 
-.main-content-form-filters > .select-input:not(:last-child) {
+.form-filters > .select-input-wrapper:not(:last-child) {
 	margin-right: 12px;
 }
 
@@ -350,12 +350,12 @@ export default Vue.extend({
 		font-size: 46px;
 	}
 
-	.main-content form {
+	.main form {
 		flex-direction: row;
 		align-items: center;
 	}
 
-	.main-content-form-filters {
+	.form-filters {
 		margin-top: 0;
 		margin-left: 12px;
 	}

@@ -1,8 +1,9 @@
 <template>
-	<div class="select-input">
+	<div class="select-input-wrapper">
 		<select
 			:disabled="disabled"
 			:value="value"
+			class="select"
 			@input="(event) => $emit('input', event.target.value)"
 		>
 			<option
@@ -40,26 +41,26 @@ export default Vue.extend({
 </script>
 
 <style>
-.select-input {
+.select-input-wrapper {
 	height: 54px;
 	width: 100%;
 	min-width: 160px;
 }
 
-.select-input select {
+.select-input-wrapper .select {
 	display: inline-block;
 	height: 100%;
 	width: 100%;
 }
 
-.select-input select {
+.select-input-wrapper .select {
 	font-size: 14px;
 	font-family: var(--font-spartan);
 	border: 2px solid var(--grey);
 	border-radius: 6px;
 }
 
-.select-input select:focus {
+.select-input-wrapper .select:focus {
 	outline-color: var(--primary);
 }
 </style>

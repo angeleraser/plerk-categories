@@ -36,6 +36,7 @@ const typeTagColorNames: { [key in CategoryType]: string } = {
 	Normal: 'normal',
 	Personalizada: 'custom',
 	Libre: 'free',
+	Todas: 'all',
 };
 
 export default Vue.extend({
@@ -48,6 +49,7 @@ export default Vue.extend({
 		price: { type: Number, required: true },
 		imgSrc: { type: String, required: true },
 		type: { type: String as () => CategoryType, required: true },
+		skelenton: {},
 	},
 
 	computed: {

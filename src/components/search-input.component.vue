@@ -1,6 +1,7 @@
 <template>
-	<div class="search-input">
+	<div class="search-input-wrapper">
 		<input
+			class="input"
 			:value="value"
 			@input="(event) => $emit('input', event.target.value)"
 			type="text"
@@ -26,12 +27,12 @@ export default Vue.extend({
 </script>
 
 <style>
-.search-input {
+.search-input-wrapper {
 	min-height: 52px;
 	width: 100%;
 }
 
-.search-input input {
+.search-input-wrapper .input {
 	height: 100%;
 	width: 100%;
 	outline: none;
@@ -43,7 +44,7 @@ export default Vue.extend({
 	font-size: 14px;
 }
 
-.search-input input:focus {
+.search-input-wrapper-input:focus {
 	border: 2px solid var(--primary);
 }
 </style>

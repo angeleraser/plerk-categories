@@ -1,4 +1,4 @@
-type CategoryType = 'Normal' | 'Libre' | 'Personalizada';
+type CategoryType = 'Normal' | 'Libre' | 'Personalizada' | 'Todas';
 
 interface Category {
 	name: string;

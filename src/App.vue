@@ -18,20 +18,6 @@
 							<span class="material-icons"> search </span>
 						</button>
 					</div>
-
-					<div class="form-filters">
-						<select-input
-							:options="categoryTypeOptions"
-							v-model="categoryType"
-							:disabled="loading"
-						/>
-
-						<select-input
-							:disabled="loading"
-							:options="categoryPriceOptions"
-							v-model="categoryPriceSort"
-						/>
-					</div>
 				</form>
 			</div>
 
@@ -60,17 +46,10 @@
 
 <script lang="ts">
 import { ApiCategoriesService } from './core/services/api.categories.service';
-import { Category, CategoryType } from './core/domain/models/category';
-import { CATEGORY_TYPES } from './core/constants/category-types';
-import {
-	CATEGORY_PRICE_LABELS,
-	PriceLabels,
-} from './core/constants/category-price-labels';
-import { getSelectOptions } from './core/utils/get-select-options';
+import { Category } from './core/domain/models/category';
 import CategoryItem from './components/category-item.vue';
 import CategoryItemSkeleton from './components/category-item-skeleton.vue';
 import SearchInput from './components/search-input.vue';
-import SelectInput from './components/select-input.vue';
 import Vue from 'vue';
 
 const CategoriesService = new ApiCategoriesService();
@@ -82,7 +61,6 @@ export default Vue.extend({
 		SearchInput,
 		CategoryItem,
 		CategoryItemSkeleton,
-		SelectInput,
 	},
 
 	methods: {
@@ -104,7 +82,7 @@ export default Vue.extend({
 
 				this.categories = data;
 
-				this.sortCategoriesByPrice(data, this.categoryPriceSort);
+				this.setCategoryItems(data);
 			} catch {
 				this.error =
 					'Ha ocurrido un error al obtener los datos, por favor, intentalo de nuevo';
@@ -123,65 +101,17 @@ export default Vue.extend({
 			this.categoryItems = items;
 			this.error = '';
 		},
-
-		sortCategoriesByPrice: async function (
-			categories: Array<Category>,
-			order: PriceLabels,
-		) {
-			if (order === 'Mayor precio') {
-				return void this.setCategoryItems(
-					await CategoriesService.sortByPrice(categories, 'high'),
-				);
-			}
-
-			if (order === 'Menor precio') {
-				return void this.setCategoryItems(
-					await CategoriesService.sortByPrice(categories, 'low'),
-				);
-			}
-		},
-
-		getFilteredCategoriesByType: async function () {
-			if (this.categoryType === 'Todas') return this.categoryListToFilter;
-
-			return CategoriesService.filterByType(
-				this.categoryListToFilter,
-				this.categoryType,
-			);
-		},
-	},
-
-	computed: {
-		categoryListToFilter: function (): Array<Category> {
-			const categories = this.categoryName
-				? this.categoryItems
-				: this.categories;
-
-			return categories;
-		},
 	},
 
 	watch: {
 		categoryName: async function (value) {
 			if (!value) {
-				const categories = await this.getFilteredCategoriesByType();
-				this.sortCategoriesByPrice(categories, this.categoryPriceSort);
+				this.setCategoryItems(this.categories);
+			} else {
+				this.setCategoryItems(
+					await CategoriesService.filterByName(this.categories, value),
+				);
 			}
-		},
-
-		categoryType: async function (value): Promise<void> {
-			if (value === 'Todas') {
-				return void this.setCategoryItems(this.categoryListToFilter);
-			}
-
-			this.setCategoryItems(
-				await CategoriesService.filterByType(this.categoryListToFilter, value),
-			);
-		},
-
-		categoryPriceSort: async function (value): Promise<void> {
-			const categories = await this.getFilteredCategoriesByType();
-			this.sortCategoriesByPrice(categories, value);
 		},
 	},
 
@@ -195,16 +125,7 @@ export default Vue.extend({
 			categoryItems: [] as Array<Category>,
 			error: '',
 			loading: false,
-			categoryPriceSort: 'Mayor precio' as PriceLabels,
 			categoryName: '',
-			categoryType: 'Todas' as CategoryType,
-			categoryTypeOptions: [
-				{ label: 'Todas', value: 'Todas' },
-				...getSelectOptions(Object.values(CATEGORY_TYPES)),
-			],
-			categoryPriceOptions: getSelectOptions(
-				Object.values(CATEGORY_PRICE_LABELS),
-			),
 		};
 	},
 });

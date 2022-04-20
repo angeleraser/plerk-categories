@@ -34,7 +34,7 @@
 				</form>
 			</div>
 
-			<div class="category-items">
+			<div class="grid-container">
 				<template v-if="!Boolean(error) && !loading">
 					<category-item-component
 						v-for="category in categoryItems"
@@ -51,7 +51,7 @@
 				</template>
 
 				<template v-if="error && !loading">
-					<div class="category-items-message">
+					<div class="error-message">
 						<span class="material-icons"> error </span>
 						{{ error }}
 					</div>
@@ -299,7 +299,7 @@ export default Vue.extend({
 	border-radius: 0 6px 6px 0;
 }
 
-.main .search-input-wrapper .input {
+.search-input-wrapper .input {
 	border-radius: 6px 0 0 6px;
 }
 
@@ -314,7 +314,7 @@ export default Vue.extend({
 	margin-right: 12px;
 }
 
-.category-items {
+.grid-container {
 	padding: 30px;
 	display: grid;
 	gap: 60px;
@@ -324,7 +324,7 @@ export default Vue.extend({
 	max-width: 1280px;
 }
 
-.category-items-message {
+.error-message {
 	font-family: var(--font-spartan);
 	font-size: 18px;
 	color: var(--negative);
@@ -337,12 +337,12 @@ export default Vue.extend({
 	place-self: center;
 }
 
-.category-items-message .material-icons {
+.error-message .material-icons {
 	margin-right: 8px;
 }
 
 @media screen and (min-width: 1024px) {
-	.category-items {
+	.grid-container {
 		grid-template-columns: 1fr 1fr 1fr;
 	}
 
@@ -350,7 +350,7 @@ export default Vue.extend({
 		font-size: 46px;
 	}
 
-	.main form {
+	.form {
 		flex-direction: row;
 		align-items: center;
 	}

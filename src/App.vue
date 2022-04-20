@@ -32,6 +32,10 @@
 			</div>
 
 			<div class="grid-container">
+				<template v-if="loading">
+					<category-item-skeleton v-for="n in 9" :key="n" />
+				</template>
+
 				<category-item
 					v-for="category in categoryItems"
 					:key="category.id"
@@ -41,16 +45,10 @@
 					:price="category.price"
 				/>
 
-				<template v-if="loading">
-					<category-item-skeleton v-for="n in 9" :key="n" />
-				</template>
-
-				<template v-if="error && !loading">
-					<div class="error-message">
-						<span class="material-icons"> error </span>
-						{{ error }}
-					</div>
-				</template>
+				<div v-if="error" class="error-message">
+					<span class="material-icons"> error </span>
+					{{ error }}
+				</div>
 			</div>
 		</main>
 	</div>
@@ -194,7 +192,7 @@ export default Vue.extend({
 			loading: false,
 			categoryPriceSort: 'Mayor precio' as PriceLabels,
 			categoryName: '',
-			categoryType: 'Todas' as CategoryType | 'Todas',
+			categoryType: 'Todas' as CategoryType,
 			categoryTypeOptions: [
 				{ label: 'Todas', value: 'Todas' },
 				...getSelectOptions(Object.values(CATEGORY_TYPES)),

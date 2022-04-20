@@ -58,6 +58,7 @@ export default Vue.extend({
 	font-family: var(--font-spartan);
 	border: 2px solid var(--grey);
 	border-radius: 6px;
+	padding: 0 6px;
 }
 
 .select-input-wrapper .select:focus {

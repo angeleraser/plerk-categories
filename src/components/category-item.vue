@@ -26,10 +26,10 @@
 </template>
 
 <script lang="ts">
+import { ApiCategoriesService } from '@/core/services/api.categories.service';
 import { CategoryType } from '@/core/domain/models/category';
-import { formatPrice } from '@/core/utils/format-price';
-import Vue from 'vue';
 import VImgComponent from './v-img.vue';
+import Vue from 'vue';
 
 const typeTagColorNames: { [key in CategoryType]: string } = {
 	Normal: 'normal',
@@ -48,7 +48,6 @@ export default Vue.extend({
 		price: { type: Number, required: true },
 		imgSrc: { type: String, required: true },
 		type: { type: String as () => CategoryType, required: true },
-		skelenton: {},
 	},
 
 	computed: {
@@ -57,7 +56,10 @@ export default Vue.extend({
 		},
 
 		formatedPrice: function (): string {
-			return formatPrice(this.price, { format: 'en-US', currency: 'USD' });
+			return ApiCategoriesService.formatCategoryCurrency(this.price, {
+				format: 'en-US',
+				currency: 'USD',
+			});
 		},
 	},
 });

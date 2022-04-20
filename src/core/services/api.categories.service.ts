@@ -13,6 +13,7 @@ class ApiCategoriesService extends CategoriesService {
 	public async getAll(): Promise<Category[]> {
 		const { data } = await api.get<ApiResponse>('/category');
 		const { data: categories } = data;
+
 		return await this.mapFromApi(categories);
 	}
 

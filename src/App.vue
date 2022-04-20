@@ -10,7 +10,7 @@
 				<form class="form" @submit.prevent="searchCategoriesByName">
 					<div class="form-text-field">
 						<search-input
-							v-model="categoryName"
+							v-model.trim="categoryName"
 							placeholder="Buscar por nombre"
 						/>
 

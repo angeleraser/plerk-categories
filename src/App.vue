@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<div class="header">
-			<h1 class="header-title">Category Search</h1>
+			<h1 class="header-title">Búsqueda de categorias</h1>
 			<span class="material-icons header-icon"> pageview </span>
 		</div>
 
@@ -9,7 +9,11 @@
 			<div class="form-container">
 				<form class="form" @submit.prevent="searchCategoriesByName">
 					<div class="form-text-field">
-						<search-input v-model="categoryName" placeholder="Search by name" />
+						<search-input
+							v-model="categoryName"
+							placeholder="Buscar por nombre"
+						/>
+
 						<button class="submit-btn" type="submit">
 							<span class="material-icons"> search </span>
 						</button>

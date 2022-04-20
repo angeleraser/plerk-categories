@@ -2,7 +2,11 @@
 	<div class="category-item">
 		<div class="category-item-data">
 			<div class="category-item-data-img">
-				<img :src="imgSrc" alt="" />
+				<v-img-component
+					:src="imgSrc"
+					:alt="name"
+					aria-label="Imagen de la categoria"
+				/>
 			</div>
 
 			<div class="category-item-data-name">
@@ -26,6 +30,7 @@
 import { CategoryType } from '@/core/domain/models/category';
 import { formatPrice } from '@/core/utils/format-price';
 import Vue from 'vue';
+import VImgComponent from './v-img.component.vue';
 
 const typeTagColorNames: { [key in CategoryType]: string } = {
 	Normal: 'normal',
@@ -34,6 +39,8 @@ const typeTagColorNames: { [key in CategoryType]: string } = {
 };
 
 export default Vue.extend({
+	components: { VImgComponent },
+
 	name: 'CategoryItem',
 
 	props: {

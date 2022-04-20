@@ -19,14 +19,27 @@
 			</div>
 
 			<div class="category-items">
-				<category-item-component
-					v-for="category in categoryItems"
-					:key="category.id"
-					:img-src="category.image"
-					:name="category.name"
-					:type="category.type"
-					:price="category.price"
-				/>
+				<template v-if="!Boolean(error) && !loading">
+					<category-item-component
+						v-for="category in categoryItems"
+						:key="category.id"
+						:img-src="category.image"
+						:name="category.name"
+						:type="category.type"
+						:price="category.price"
+					/>
+				</template>
+
+				<template v-if="loading">
+					<category-item-skeleton-component v-for="n in 9" :key="n" />
+				</template>
+
+				<template v-if="error && !loading">
+					<div class="category-items-message">
+						<span class="material-icons"> error </span>
+						{{ error }}
+					</div>
+				</template>
 			</div>
 		</div>
 	</div>
@@ -38,13 +51,18 @@ import { Category } from './core/domain/models/category';
 import CategoryItemComponent from './components/category-item.component.vue';
 import SearchInputComponent from './components/search-input.component.vue';
 import Vue from 'vue';
+import CategoryItemSkeletonComponent from './components/category-item-skeleton.component.vue';
 
 const CategoriesService = new ApiCategoriesService();
 
 export default Vue.extend({
 	name: 'App',
 
-	components: { SearchInputComponent, CategoryItemComponent },
+	components: {
+		SearchInputComponent,
+		CategoryItemComponent,
+		CategoryItemSkeletonComponent,
+	},
 
 	methods: {
 		searchCategoriesByName: async function () {
@@ -62,7 +80,7 @@ export default Vue.extend({
 				const data = await CategoriesService.getAll();
 
 				this.categories = data;
-				this.setCategoryItems(data);
+				this.setCategoryItems(this.categories);
 			} catch {
 				this.error =
 					'Ha ocurrido un error al obtener los datos, por favor, intentalo de nuevo';
@@ -73,7 +91,7 @@ export default Vue.extend({
 
 		setCategoryItems: function (items: Array<Category>) {
 			if (items.length === 0) {
-				this.error = 'No se encontraron categorias';
+				this.error = 'No se encontraron categorias para mostrar.';
 				return;
 			}
 
@@ -85,7 +103,7 @@ export default Vue.extend({
 	watch: {
 		searchQuery: function (value) {
 			if (!value) {
-				this.categoryItems = this.categories;
+				this.setCategoryItems(this.categories);
 			}
 		},
 	},
@@ -196,6 +214,23 @@ export default Vue.extend({
 	place-content: center;
 	grid-template-columns: minmax(160px, 460px);
 	max-width: 1280px;
+}
+
+.category-items-message {
+	font-family: var(--font-spartan);
+	font-size: 18px;
+	color: var(--negative);
+	font-weight: 600;
+	text-align: center;
+	grid-column: span 3;
+	max-width: 480px;
+	display: flex;
+	align-items: center;
+	place-self: center;
+}
+
+.category-items-message .material-icons {
+	margin-right: 8px;
 }
 
 @media screen and (min-width: 1024px) {

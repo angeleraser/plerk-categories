@@ -1,0 +1,19 @@
+@import url('./reset.min.css');
+
+:root {
+	--primary: #0051bb;
+	--secondary: #00bb98;
+	--accent: #1c355e;
+	--dark: #1d1d1d;
+	--positive: #21ba45;
+	--negative: #ff4343;
+	--info: #708783;
+	--warning: #f2c037;
+	--white: #fff;
+	--grey: #ccc;
+	--normal: #f1ddbf;
+	--yellow: #f9ffa4;
+	--turquoise: #40dfef;
+	--main-breakpoint: 1024px;
+	--font-spartan: 'Spartan', Arial, Helvetica, sans-serif;
+}

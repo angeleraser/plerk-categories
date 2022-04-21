@@ -135,7 +135,7 @@ export default Vue.extend({
 			this.handleSearch(name, this.categoryType, this.categoryPriceSort);
 		},
 
-		categoryType: function (type) {
+		categoryType: function (type: CategoryType) {
 			this.handleSearch(this.categoryName, type, this.categoryPriceSort);
 		},
 

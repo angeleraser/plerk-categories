@@ -4,6 +4,24 @@ import { Category, CategoryType } from '../models/category';
 abstract class CategoriesService {
 	abstract getAll(): Promise<Category[]>;
 
+	public async filterBy(
+		categories: Array<Category>,
+		options: { name: string; type: CategoryType; price: 'high' | 'low' },
+	): Promise<Category[]> {
+		const filteredByName = options.name
+			? await this.filterByName(categories, options.name)
+			: categories;
+
+		const byType =
+			options.type === 'Todas'
+				? filteredByName
+				: await this.filterByType(filteredByName, options.type);
+
+		const sortByPrice = await this.sortByPrice(byType, options.price);
+
+		return sortByPrice;
+	}
+
 	public async filterByName(
 		categories: Category[],
 		query: string,

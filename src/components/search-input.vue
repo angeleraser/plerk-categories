@@ -44,7 +44,7 @@ export default Vue.extend({
 	font-size: 14px;
 }
 
-.search-input-wrapper-input:focus {
+.search-input-wrapper .input:focus {
 	border: 2px solid var(--primary);
 }
 </style>

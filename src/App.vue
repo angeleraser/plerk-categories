@@ -7,7 +7,7 @@
 
 		<main class="main">
 			<div class="form-container">
-				<form class="form" @submit.prevent="searchCategoriesByName">
+				<form class="form">
 					<div class="form-text-field">
 						<search-input
 							v-model.trim="categoryName"
@@ -64,17 +64,6 @@ export default Vue.extend({
 	},
 
 	methods: {
-		searchCategoriesByName: async function () {
-			if (!this.categoryName) return;
-
-			const categories = await CategoriesService.filterByName(
-				this.categories,
-				this.categoryName,
-			);
-
-			this.setCategoryItems(categories);
-		},
-
 		fetchAllCategories: async function () {
 			try {
 				this.loading = true;

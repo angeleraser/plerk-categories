@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { ApiCategoriesService } from './core/services/api.categories.service';
+import { MockCategoriesService } from './core/services/mock.categories.service';
 import { CATEGORY_TYPES } from './core/constants/category-types';
 import { Category, CategoryType } from './core/domain/models/category';
 import { getSelectOptions } from './core/utils/get-select-options';
@@ -71,7 +71,7 @@ import {
 	PriceLabels,
 } from './core/constants/category-price-labels';
 
-const CategoriesService = new ApiCategoriesService();
+const CategoriesService = new MockCategoriesService();
 
 export default Vue.extend({
 	name: 'App',

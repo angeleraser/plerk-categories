@@ -2,7 +2,7 @@ type CategoryType = 'Normal' | 'Libre' | 'Personalizada' | 'Todas';
 
 interface Category {
 	name: string;
-	image: string;
+	image: string | null;
 	price: number;
 	id: string;
 	type: CategoryType;

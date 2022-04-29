@@ -7,7 +7,7 @@
 
 		<main class="main">
 			<div class="form-container">
-				<form class="form">
+				<form class="form" @submit.prevent>
 					<div class="form-text-field">
 						<search-input
 							v-model.trim="categoryName"
@@ -17,6 +17,18 @@
 						<button class="submit-btn" type="submit">
 							<span class="material-icons"> search </span>
 						</button>
+					</div>
+
+					<div class="form-filters">
+						<select-input
+							v-model="categoryType"
+							:options="categoryTypesOptions"
+						/>
+
+						<select-input
+							v-model="categoryPriceSort"
+							:options="categoryPriceSortOptions"
+						/>
 					</div>
 				</form>
 			</div>
@@ -45,14 +57,21 @@
 </template>
 
 <script lang="ts">
-import { ApiCategoriesService } from './core/services/api.categories.service';
-import { Category } from './core/domain/models/category';
+import { MockCategoriesService } from './core/services/mock.categories.service';
+import { CATEGORY_TYPES } from './core/constants/category-types';
+import { Category, CategoryType } from './core/domain/models/category';
+import { getSelectOptions } from './core/utils/get-select-options';
 import CategoryItem from './components/category-item.vue';
 import CategoryItemSkeleton from './components/category-item-skeleton.vue';
 import SearchInput from './components/search-input.vue';
+import SelectInput from './components/select-input.vue';
 import Vue from 'vue';
+import {
+	CATEGORY_PRICE_LABELS,
+	PriceLabels,
+} from './core/constants/category-price-labels';
 
-const CategoriesService = new ApiCategoriesService();
+const CategoriesService = new MockCategoriesService();
 
 export default Vue.extend({
 	name: 'App',
@@ -61,6 +80,7 @@ export default Vue.extend({
 		SearchInput,
 		CategoryItem,
 		CategoryItemSkeleton,
+		SelectInput,
 	},
 
 	methods: {
@@ -71,7 +91,11 @@ export default Vue.extend({
 
 				this.categories = data;
 
-				this.setCategoryItems(data);
+				this.handleSearch(
+					this.categoryName,
+					this.categoryType,
+					this.categoryPriceSort,
+				);
 			} catch {
 				this.error =
 					'Ha ocurrido un error al obtener los datos, por favor, intentalo de nuevo';
@@ -90,17 +114,33 @@ export default Vue.extend({
 			this.categoryItems = items;
 			this.error = '';
 		},
+
+		handleSearch: async function (
+			name: string,
+			type: CategoryType,
+			price: PriceLabels,
+		) {
+			const data = await CategoriesService.filterBy(this.categories, {
+				name,
+				type,
+				price: price === 'Mayor precio' ? 'high' : 'low',
+			});
+
+			this.setCategoryItems(data);
+		},
 	},
 
 	watch: {
-		categoryName: async function (value) {
-			if (!value) {
-				this.setCategoryItems(this.categories);
-			} else {
-				this.setCategoryItems(
-					await CategoriesService.filterByName(this.categories, value),
-				);
-			}
+		categoryName: function (name) {
+			this.handleSearch(name, this.categoryType, this.categoryPriceSort);
+		},
+
+		categoryType: function (type: CategoryType) {
+			this.handleSearch(this.categoryName, type, this.categoryPriceSort);
+		},
+
+		categoryPriceSort: function (sortType: PriceLabels) {
+			this.handleSearch(this.categoryName, this.categoryType, sortType);
 		},
 	},
 
@@ -115,6 +155,15 @@ export default Vue.extend({
 			error: '',
 			loading: false,
 			categoryName: '',
+			categoryType: 'Todas' as CategoryType,
+			categoryPriceSort: 'Mayor precio' as PriceLabels,
+			categoryTypesOptions: [
+				{ label: 'Todas', value: 'Todas' },
+				...getSelectOptions(Object.values(CATEGORY_TYPES)),
+			],
+			categoryPriceSortOptions: [
+				...getSelectOptions(Object.values(CATEGORY_PRICE_LABELS)),
+			],
 		};
 	},
 });
@@ -190,6 +239,17 @@ export default Vue.extend({
 	align-items: center;
 }
 
+.form-filters {
+	display: flex;
+	align-items: center;
+	margin-top: 16px;
+	width: 100%;
+}
+
+.form-filters > .select-input-wrapper:not(:last-child) {
+	margin-right: 12px;
+}
+
 .form .submit-btn {
 	display: flex;
 	color: var(--white);
@@ -244,6 +304,11 @@ export default Vue.extend({
 	.form {
 		flex-direction: row;
 		align-items: center;
+	}
+
+	.form-filters {
+		margin-top: 0;
+		margin-left: 12px;
 	}
 }
 </style>
